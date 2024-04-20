@@ -1,3 +1,4 @@
+import { EOL } from 'node:os';
 import test from 'ava';
 import sh from 'shelljs';
 import Shell from '../lib/shell.js';
@@ -90,7 +91,13 @@ test.serial('should not fail (exit code 0) if there are no commits', async t => 
   const options = { git: { requireCommits: true, requireCommitsFail: false } };
   const gitClient = factory(Git, { options });
   sh.exec('git tag 1.0.0');
-  await t.throwsAsync(gitClient.init(), { code: 0 });
+
+  const docs = 'https://git.io/release-it-git';
+
+  await t.notThrowsAsync(
+    gitClient.init(),
+    `There are no commits since the latest tag.${EOL}Documentation: ${docs}${EOL}`
+  );
 });
 
 test.serial('should throw if there are no commits in specified path', async t => {
